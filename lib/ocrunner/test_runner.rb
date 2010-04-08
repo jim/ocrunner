@@ -105,7 +105,6 @@ module OCRunner
       # test case passed
       if line =~ /Test Case .+ passed/
         @current_case.passed = true
-        @current_suite.cases << @current_case
         @current_case = nil
         print(green('.'))
       end
@@ -121,14 +120,13 @@ module OCRunner
       # start test suite
       if line =~ /Test Suite '([^\/]+)' started/
         @current_suite = TestSuite.new($1)
+        @suites << @current_suite
         print "#{$1} "
       end
 
       # finish test suite
       if @current_suite && line =~ /^Executed/ && line =~ /\(([\d\.]+)\) seconds/
         @current_suite.time = $1
-        @suites << @current_suite
-        @current_suite = nil
         print "\n" # clear console line
       end
 

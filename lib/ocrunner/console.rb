@@ -1,3 +1,5 @@
+# color helpers courtesy of RSpec http://github.com/dchelimsky/rspec
+
 module OCRunner
   module Console
     def colorize(text, color_code)

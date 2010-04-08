@@ -2,35 +2,31 @@ module OCRunner
   class TestRunner
     include Console
   
-    attr :suites
-    attr :current_directory
-    attr :options
-    attr :log
+    attr_reader :suites, :current_directory, :options, :log, :command
     
     def initialize(options)
       @suites = []
       @log = ''
       @current_directory = Dir.pwd
       @options = options
+      
+      build_command
       run_tests
       display_summary
-      puts @log if @options[:verbose]
+      display_log
     end
   
-    def clean_path(path)
-      path.gsub(@current_directory + '/', '')
+    def build_command
+      @command = "xcodebuild -target #{@options[:target]} -configuration #{@options[:config]} " +
+                 "-sdk #{@options[:sdk]} #{@options[:parallel] ? '-parallelizeTargets' : ''} build"
+     if @options[:debug_command]
+       puts @command
+       exit
+     end
     end
   
     def run_tests
-      cmd = "xcodebuild -target #{@options[:target]} -configuration #{@options[:config]} " +
-            "-sdk #{@options[:sdk]} #{@options[:parallel] ? '-parallelizeTargets' : ''} build"
-            
-      if @options[:debug_command]
-        puts cmd
-        exit
-      end
-            
-      IO.popen("#{cmd} 2>&1") do |f| 
+      IO.popen("#{@command} 2>&1") do |f| 
         while line = f.gets do 
           @log << line
           process_console_output(line)
@@ -62,6 +58,10 @@ module OCRunner
       else
         puts red('*** BUILD FAILED ***')
       end
+    end
+  
+    def display_log
+      puts @log if @options[:verbose]
     end
   
     def process_console_output(line)
@@ -97,13 +97,22 @@ module OCRunner
       end
 
       # finish test suite
-      # Executed 4 tests, with 0 failures (0 unexpected) in 0.024 (0.026) seconds
       if @current_suite && line =~ /^Executed/ && line =~ /\(([\d\.]+)\) seconds/
         @current_suite.time = $1
         @suites << @current_suite
         @current_suite = nil
         print "\n" # clear console line
       end
+      
+      # no Xcode project found
+      if line =~ /does not contain an Xcode project/
+        puts red('No Xcode project was found.')
+        exit
+      end
+    end
+    
+    def clean_path(path)
+      path.gsub(@current_directory + '/', '')
     end
   
   end

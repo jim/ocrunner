@@ -1,10 +1,7 @@
 module OCRunner
   class TestCase
     attr :name
-    attr_accessor :passed
-    attr_accessor :path
-    attr_accessor :line
-    attr_accessor :message
+    attr_accessor :passed, :path, :line, :message
     
     def initialize(name)
       @name = name

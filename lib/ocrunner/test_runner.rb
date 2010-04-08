@@ -74,6 +74,7 @@ module OCRunner
     end
     
     def display_results
+      puts
       puts @log if @options[:verbose] || compilation_error_occurred
       puts @output.join("\n")
       puts

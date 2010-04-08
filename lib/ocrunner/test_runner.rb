@@ -3,8 +3,8 @@ module OCRunner
     include Console
     
     class BuildFailure < StandardError; end
-  
-    attr_reader :suites, :current_directory, :options, :log, :command
+
+    attr_reader :compilation_error_occurred
     
     def initialize(options)
       @suites = []
@@ -12,11 +12,19 @@ module OCRunner
       @current_directory = Dir.pwd
       @options = options
       @passed = true
+      @compilation_error_occurred = false
+      @output = []
       
+      setup
       build_command
       run_tests
-      display_summary
-      display_log
+      summarize
+      display_results
+    end
+  
+    def setup
+      puts "="*80
+      puts
     end
   
     def build_command
@@ -38,24 +46,25 @@ module OCRunner
       end
     end
   
-    def display_summary
+    def summarize
+      
       @suites.each do |suite|
         suite.cases.reject {|kase| kase.passed}.each do |kase|
-          puts
-          puts '  ' + red("[#{suite.name} #{kase.name}] FAIL")
+          out
+          out '  ' + red("[#{suite.name} #{kase.name}] FAIL")
           kase.errors.each do |error|
-            puts '    ' + red(error.message) + " line #{error.line} of #{clean_path(error.path)}"
+            out '    ' + red(error.message) + " line #{error.line} of #{clean_path(error.path)}"
           end
         end
-        puts
+        out
       end
       
       @suites.each do |suite|
         failed = suite.cases.reject {|c| c.passed}
-        puts "Suite '#{suite.name}': #{suite.cases.size - failed.size} passes and #{failed.size} failures in #{suite.time} seconds."
+        out "Suite '#{suite.name}': #{suite.cases.size - failed.size} passes and #{failed.size} failures in #{suite.time} seconds."
       end
       
-      puts
+      out
       
       if @passed
         build_succeeded
@@ -64,23 +73,25 @@ module OCRunner
       end
     end
     
+    def display_results
+      puts @log if @options[:verbose] || compilation_error_occurred
+      puts @output.join("\n")
+      puts
+    end
+    
     def build_error(message)
-      puts red(message)
+      out red(message)
       @passed = false
     end
 
     def build_failed
       growl('BUILD FAILED!')
-      puts red('*** BUILD FAILED ***')
+      out red('*** BUILD FAILED ***')
     end
     
     def build_succeeded
       growl('Build succeeded.')
-      puts green('*** BUILD SUCCEEDED ***')
-    end
-  
-    def display_log
-      puts @log if @options[:verbose]
+      out green('*** BUILD SUCCEEDED ***')
     end
 
     def process_console_output(line)
@@ -103,6 +114,7 @@ module OCRunner
       if line =~ /(.+\.m):(\d+): error: -\[(.+) (.+)\] :(?: (.+):?)? /
         @current_case.passed = false
         @current_case.errors << TestError.new($1, $2, $5)
+        @passed = false
         print red('.')
       end
 
@@ -127,10 +139,12 @@ module OCRunner
       
       # compilation reference error
       if line =~ /"(.+)", referenced from:/
-        puts red($&)
+        compilation_error_occurred!
+        build_error($&)
       end
       if line =~ /-\[\w+ \w+\] in .+\.o/
-        puts red($&)
+        compilation_error_occurred!
+        build_error($&)
       end
       
       # no Xcode project found
@@ -138,6 +152,14 @@ module OCRunner
         build_error('No Xcode project was found.')
       end
       
+    end
+   
+    def compilation_error_occurred!
+      @compilation_error_occurred = true
+    end
+   
+    def out(line = '')
+      @output << line
     end
     
     def clean_path(path)

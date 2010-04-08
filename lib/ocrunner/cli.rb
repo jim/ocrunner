@@ -28,7 +28,12 @@ module OCRunner
         opt :loud_compilation, "Always show verbose output when a compilation or linking error occurs", :type => :boolean, :default => true
       end
       
+      puts "ocrunner started. control-c to exit, control-\\ to toggle verbosity"
+      
       execute = Proc.new{ OCRunner::TestRunner.new(opts) }
+
+      Kernel.trap('QUIT') { opts[:verbose] = !opts[:verbose]; execute.call}
+
       execute.call
       
       if opts[:auto]

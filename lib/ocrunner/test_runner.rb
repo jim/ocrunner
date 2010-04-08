@@ -37,12 +37,10 @@ module OCRunner
     end
   
     def run_tests
-      IO.popen("#{@command} 2>&1") do |f| 
-        while line = f.gets do 
-          @log << line
-          process_console_output(line)
-          $stdout.flush
-        end
+      execute @command do |line|
+        @log << line
+        process_console_output(line)
+        $stdout.flush
       end
     end
   
@@ -50,7 +48,6 @@ module OCRunner
       
       @suites.each do |suite|
         suite.cases.reject {|kase| kase.passed?}.each do |kase|
-          out
           out '  ' + red("[#{suite.name} #{kase.name}] FAIL")
           kase.errors.each do |error|
             out '    ' + red(error.message) + " line #{error.line} of #{clean_path(error.path)}"
@@ -74,7 +71,6 @@ module OCRunner
     end
     
     def display_results
-      puts
       puts @log if @options[:verbose] || (compilation_error_occurred && @options[:loud_compilation])
       puts @output.join("\n")
       puts
@@ -134,9 +130,9 @@ module OCRunner
       if line =~ /The executable for the test bundle at (.+\.octest) could not be found/
         build_error("Test executable #{clean_path($1)} could not be found")
       end
-      
+
       # compilation errors
-      if line =~ /(.+\.m):(\d+): error: (.*)/
+      if !@current_case && line =~ /(.+\.m):(\d+): error: (.*)/
         compilation_error_occurred!
         build_error($&)      
       end
@@ -179,7 +175,19 @@ module OCRunner
   
     def growl(message)
       if @options[:growl]
-        `growlnotify -i "xcodeproj" -m "#{message}" `
+        execute "growlnotify -i \"xcodeproj\" -m \"#{message}\"" do |error|
+          if error =~ /command not found/
+            out red('You must have growl and growl notify installed to enable growl support. See http://growl.info.')
+          end
+        end
+      end
+    end
+  
+    def execute(cmd, &block)
+      IO.popen("#{cmd} 2>&1") do |f| 
+        while line = f.gets do 
+          yield line
+        end
       end
     end
   

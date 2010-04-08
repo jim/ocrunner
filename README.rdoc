@@ -12,8 +12,10 @@ To use this, you'll need to be set up with a test target. See http://developer.a
 To run tests as files are changed (autotest-style), use:
 
   ocrunner --auto
-	
-You can see all the available options by running ocrunner -h.
+
+== I don't like your defaults
+
+Don't worry, you can specify the target/configuration/sdk options passed to xcodebuild. You can see all the available options by running ocrunner -h.
 
 == Note on Patches/Pull Requests
  

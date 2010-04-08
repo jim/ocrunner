@@ -2,7 +2,7 @@
 
 ocrunner is a little Ruby wrapper for running OCUnit tests in Xcode from the command line. Its main purpose is to parse the huge output from xcodebuild and display a pretty summary to the user.
 
-To user this, you'll need to have set yourself with a test target. See http://developer.apple.com/mac/articles/tools/unittestingwithxcode3.html
+To user this, you'll need to be set up with a test target. See http://developer.apple.com/mac/articles/tools/unittestingwithxcode3.html
 
 == Usage
 

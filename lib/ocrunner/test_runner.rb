@@ -23,7 +23,7 @@ module OCRunner
     end
   
     def setup
-      puts "="*80
+      puts "-"*80
       puts
     end
   

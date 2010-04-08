@@ -6,7 +6,7 @@ begin
   Jeweler::Tasks.new do |gem|
     gem.name = "ocrunner"
     gem.summary = %Q{A small Ruby wrapper for running OCUnit tests with xcodebuilder}
-    gem.description = %Q{Provides pretty console output}
+    gem.description = %Q{Provides pretty console output for running OCUnit tests with xcodebuilder from the command line}
     gem.email = "jim@autonomousmachine.com"
     gem.homepage = "http://github.com/jim/ocrunner"
     gem.authors = ["Jim Benton"]

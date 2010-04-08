@@ -115,6 +115,7 @@ module OCRunner
 
       # start test suite
       if line =~ /Test Suite '([^\/]+)' started/
+        puts line
         @current_suite = TestSuite.new($1)
         @suites << @current_suite
         print "#{$1} "
@@ -148,6 +149,11 @@ module OCRunner
         compilation_error_occurred!
         build_error($&)
       end
+      
+      # bus error
+      if line =~ /Bus error/
+        build_error('Bus error while running tests.')        
+      end      
       
       # segfault
       if line =~ /Segmentation fault/

@@ -20,7 +20,7 @@ module OCRunner
         opt :sdk, "SDK to build against", :default => 'iphonesimulator3.1.3'
         opt :target, 'Target to build', :default => 'Test'
         opt :config, "Configuration to use", :default => 'Debug'
-        opt :parallel, "Use multiple processors to build (parallelizeTargets)", :type => :boolean, :default => true
+        opt :parallel, "Use multiple processors to build multiple targets (parallelizeTargets)", :type => :boolean, :default => true
         opt :auto, "Watch filesystem for changes and run tests when they occur", :type => :boolean, :default => false
         opt :growl, "Report results using Growl", :type => :boolean, :default => false
         opt :debug_command, "Print xcodebuild command and exit", :type => :boolean, :default => false

@@ -30,6 +30,8 @@ Gem::Specification.new do |s|
      "lib/ocrunner/console.rb",
      "lib/ocrunner/test_case.rb",
      "lib/ocrunner/test_runner.rb",
+     "lib/ocrunner/test_suite.rb",
+     "ocrunner.gemspec",
      "test/helper.rb",
      "test/test_ocrunner.rb"
   ]

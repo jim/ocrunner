@@ -4,7 +4,8 @@ module OCRunner
   module CLI
     def self.run
       opts = Trollop::options do
-        version "0.1 (c) 2010 Jim Benton"
+        v = File.read(File.join(File.dirname(__FILE__), '../../VERSION')).strip
+        version "#{v} (c) 2010 Jim Benton github.com/jim/ocrunner"
         banner <<-EOS
       ocrunner is a small ruby wrapper for running automated XCode builds.
 

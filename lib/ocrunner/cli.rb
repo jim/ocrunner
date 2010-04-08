@@ -25,6 +25,7 @@ module OCRunner
         opt :growl, "Report results using Growl", :type => :boolean, :default => false
         opt :debug_command, "Print xcodebuild command and exit", :type => :boolean, :default => false
         opt :verbose, "Display all xcodebuild output after summary", :type => :boolean, :default => false
+        opt :loud_compilation, "Always show verbose output when a compilation or linking error occurs", :type => :boolean, :default => true
       end
       
       execute = Proc.new{ OCRunner::TestRunner.new(opts) }

@@ -49,7 +49,7 @@ module OCRunner
     def summarize
       
       @suites.each do |suite|
-        suite.cases.reject {|kase| kase.passed}.each do |kase|
+        suite.cases.reject {|kase| kase.passed?}.each do |kase|
           out
           out '  ' + red("[#{suite.name} #{kase.name}] FAIL")
           kase.errors.each do |error|
@@ -60,7 +60,7 @@ module OCRunner
       end
       
       @suites.each do |suite|
-        failed = suite.cases.reject {|c| c.passed}
+        failed = suite.cases.reject {|kase| kase.passed?}
         out "Suite '#{suite.name}': #{suite.cases.size - failed.size} passes and #{failed.size} failures in #{suite.time} seconds."
       end
       
@@ -75,7 +75,7 @@ module OCRunner
     
     def display_results
       puts
-      puts @log if @options[:verbose] || compilation_error_occurred
+      puts @log if @options[:verbose] || (compilation_error_occurred && @options[:loud_compilation])
       puts @output.join("\n")
       puts
     end
@@ -105,14 +105,13 @@ module OCRunner
     
       # test case passed
       if line =~ /Test Case .+ passed/
-        @current_case.passed = true
         @current_case = nil
         print(green('.'))
       end
       
       # test failure
       if line =~ /(.+\.m):(\d+): error: -\[(.+) (.+)\] :(?: (.+):?)?/
-        @current_case.passed = false
+        @current_case.fail!
         @current_case.errors << TestError.new($1, $2, $5)
         @passed = false
         print red('.')

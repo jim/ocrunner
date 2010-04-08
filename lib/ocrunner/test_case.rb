@@ -10,6 +10,15 @@ module OCRunner
     def initialize(name)
       @name = name
       @errors = []
+      @passed = true
+    end
+    
+    def fail!
+      @passed = false
+    end
+    
+    def passed?
+      @passed
     end
   end
 end

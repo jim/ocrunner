@@ -10,5 +10,13 @@ module OCRunner
       @name = name
       @cases = []
     end
+    
+    def failures?
+      @cases.any? {|kase| !kase.passed?}
+    end
+    
+    def failed_cases
+      @cases.reject {|kase| kase.passed?}
+    end
   end
 end

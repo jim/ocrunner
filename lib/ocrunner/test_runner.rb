@@ -47,18 +47,18 @@ module OCRunner
     def summarize
       
       @suites.each do |suite|
-        suite.cases.reject {|kase| kase.passed?}.each do |kase|
+        suite.failed_cases.each do |kase|
           out '  ' + red("[#{suite.name} #{kase.name}] FAIL")
           kase.errors.each do |error|
             out '    ' + red(error.message) + " line #{error.line} of #{clean_path(error.path)}"
           end
         end
-        out
+        out if suite.failures?
       end
       
       @suites.each do |suite|
-        failed = suite.cases.reject {|kase| kase.passed?}
-        out "Suite '#{suite.name}': #{suite.cases.size - failed.size} passes and #{failed.size} failures in #{suite.time} seconds."
+        number = suite.failed_cases.size
+        out "Suite '#{suite.name}': #{suite.cases.size - number} passes and #{number} failures in #{suite.time} seconds."
       end
       
       out

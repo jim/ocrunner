@@ -1,6 +1,6 @@
 = ocrunner
 
-Description goes here.
+ocrunner is a little Ruby wrapper for running OCUnit tests in XCode from the command line. Its main purpose is to parse the huge output from xcodebuild and display a pretty summary to the user.
 
 == Note on Patches/Pull Requests
  

@@ -5,13 +5,12 @@ begin
   require 'jeweler'
   Jeweler::Tasks.new do |gem|
     gem.name = "ocrunner"
-    gem.summary = %Q{TODO: one-line summary of your gem}
-    gem.description = %Q{TODO: longer description of your gem}
+    gem.summary = %Q{A small Ruby wrapper for running OCUnit tests with xcodebuilder}
+    gem.description = %Q{Provides pretty console output}
     gem.email = "jim@autonomousmachine.com"
     gem.homepage = "http://github.com/jim/ocrunner"
     gem.authors = ["Jim Benton"]
-    gem.add_development_dependency "thoughtbot-shoulda", ">= 0"
-    # gem is a Gem::Specification... see http://www.rubygems.org/read/chapter/20 for additional settings
+    gem.add_dependency('trollop')
   end
   Jeweler::GemcutterTasks.new
 rescue LoadError

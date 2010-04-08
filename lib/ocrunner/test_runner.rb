@@ -136,11 +136,19 @@ module OCRunner
         build_error("Test executable #{clean_path($1)} could not be found")
       end
       
+      # compilation errors
+      if line =~ /(.+\.m):(\d+): error: (.*)/
+        compilation_error_occurred!
+        build_error($&)      
+      end
+      
       # compilation reference error
       if line =~ /"(.+)", referenced from:/
         compilation_error_occurred!
         build_error($&)
       end
+      
+      # linking error
       if line =~ /-\[\w+ \w+\] in .+\.o/
         compilation_error_occurred!
         build_error($&)

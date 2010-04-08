@@ -27,6 +27,7 @@ Gem::Specification.new do |s|
      "VERSION",
      "bin/ocrunner",
      "lib/ocrunner.rb",
+     "lib/ocrunner/cli.rb",
      "lib/ocrunner/console.rb",
      "lib/ocrunner/test_case.rb",
      "lib/ocrunner/test_runner.rb",

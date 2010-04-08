@@ -2,7 +2,7 @@ require 'trollop'
 
 module OCRunner
   module CLI
-    def run
+    def self.run
       opts = Trollop::options do
         version "0.1 (c) 2010 Jim Benton"
         banner <<-EOS

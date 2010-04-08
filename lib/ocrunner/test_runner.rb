@@ -110,7 +110,7 @@ module OCRunner
       end
       
       # test failure
-      if line =~ /(.+\.m):(\d+): error: -\[(.+) (.+)\] :(?: (.+):?)? /
+      if line =~ /(.+\.m):(\d+): error: -\[(.+) (.+)\] :(?: (.+):?)?/
         @current_case.passed = false
         @current_case.errors << TestError.new($1, $2, $5)
         @passed = false
@@ -143,6 +143,11 @@ module OCRunner
       if line =~ /-\[\w+ \w+\] in .+\.o/
         compilation_error_occurred!
         build_error($&)
+      end
+      
+      # segfault
+      if line =~ /Segmentation fault/
+        build_error('Segmentation fault while running tests.')        
       end
       
       # no Xcode project found

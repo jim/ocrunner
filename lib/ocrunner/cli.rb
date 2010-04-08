@@ -8,8 +8,8 @@ module OCRunner
       Kernel.trap('INT') { exit }
       
       opts = Trollop::options do
-        v = File.read(File.join(File.dirname(__FILE__), '../../VERSION')).strip
-        version "#{v} (c) 2010 Jim Benton github.com/jim/ocrunner"
+        version_number = File.read(File.join(File.dirname(__FILE__), '../../VERSION')).strip
+        version "#{version_number} (c) 2010 Jim Benton github.com/jim/ocrunner"
         banner <<-EOS
       ocrunner is a small ruby wrapper for running automated XCode builds.
 
@@ -28,19 +28,15 @@ module OCRunner
       end
       
       execute = Proc.new{ OCRunner::TestRunner.new(opts) }
+      execute.call
       
       if opts[:auto]
-        execute.call
-        
         FSSM.monitor(Dir.pwd, %w{**/*.m **/*.h}) do
           create { |base, relative| execute.call }
           update { |base, relative| execute.call }
           delete { |base, relative| execute.call }
         end
-        
       end
-      
-      execute.call
       
     end
   end

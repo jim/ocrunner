@@ -52,10 +52,14 @@ module OCRunner
         failed = suite.cases.reject {|c| c.passed}
         puts "Suite '#{suite.name}': #{suite.cases.size - failed.size} passes and #{failed.size} failures in #{suite.time} seconds."
       end
+      
       puts
+      
       if passed
-        puts green('*** BUILD SUCCEEDED ***')        
+        growl('Build succeeded.')
+        puts green('*** BUILD SUCCEEDED ***')
       else
+        growl('BUILD FAILED!')
         puts red('*** BUILD FAILED ***')
       end
     end
@@ -113,6 +117,12 @@ module OCRunner
     
     def clean_path(path)
       path.gsub(@current_directory + '/', '')
+    end
+  
+    def growl(message)
+      if @options[:growl]
+        `growlnotify -i "xcodeproj" -m "#{message}" `
+      end
     end
   
   end

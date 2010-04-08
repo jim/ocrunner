@@ -22,6 +22,7 @@ module OCRunner
         opt :config, "Configuration to use", :default => 'Debug'
         opt :parallel, "Use multiple processors to build (parallelizeTargets)", :type => :boolean, :default => true
         opt :auto, "Watch filesystem for changes and run tests when they occur", :type => :boolean, :default => false
+        opt :growl, "Report results using Growl", :type => :boolean, :default => false
         opt :debug_command, "Print xcodebuild command and exit", :type => :boolean, :default => false
         opt :verbose, "Display all xcodebuild output after summary", :type => :boolean, :default => false
       end

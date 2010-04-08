@@ -1,10 +1,15 @@
 module OCRunner
   class TestCase
-    attr :name
-    attr_accessor :passed, :path, :line, :message
     
+    # Container for test case info
+
+    attr :name
+    attr_accessor :passed
+    attr_accessor :errors
+        
     def initialize(name)
       @name = name
+      @errors = []
     end
   end
 end

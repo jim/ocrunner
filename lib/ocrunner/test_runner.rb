@@ -1,6 +1,8 @@
 module OCRunner
   class TestRunner
     include Console
+    
+    class BuildFailure < StandardError; end
   
     attr_reader :suites, :current_directory, :options, :log, :command
     
@@ -9,6 +11,7 @@ module OCRunner
       @log = ''
       @current_directory = Dir.pwd
       @options = options
+      @passed = true
       
       build_command
       run_tests
@@ -36,14 +39,13 @@ module OCRunner
     end
   
     def display_summary
-      passed = true
       @suites.each do |suite|
-        failed = suite.cases.reject {|c| c.passed}
-        failed.each do |c|
-          passed = false
+        suite.cases.reject {|kase| kase.passed}.each do |kase|
           puts
-          puts '  ' + red("[#{suite.name} #{c.name}] FAIL") + " on line #{c.line} of #{clean_path(c.path)}"
-          puts '  ' + c.message unless c.message.nil?
+          puts '  ' + red("[#{suite.name} #{kase.name}] FAIL")
+          kase.errors.each do |error|
+            puts '    ' + red(error.message) + " line #{error.line} of #{clean_path(error.path)}"
+          end
         end
         puts
       end
@@ -55,24 +57,38 @@ module OCRunner
       
       puts
       
-      if passed
-        growl('Build succeeded.')
-        puts green('*** BUILD SUCCEEDED ***')
+      if @passed
+        build_succeeded
       else
-        growl('BUILD FAILED!')
-        puts red('*** BUILD FAILED ***')
+        build_failed
       end
+    end
+    
+    def build_error(message)
+      puts red(message)
+      @passed = false
+    end
+
+    def build_failed
+      growl('BUILD FAILED!')
+      puts red('*** BUILD FAILED ***')
+    end
+    
+    def build_succeeded
+      growl('Build succeeded.')
+      puts green('*** BUILD SUCCEEDED ***')
     end
   
     def display_log
       puts @log if @options[:verbose]
     end
-  
+
     def process_console_output(line)
 
       # test case started
-      if line =~ /Test Case '-\[\w+ (.+)\]' started/
+      if line =~ /Test Case '-\[.+ (.+)\]' started/
         @current_case = TestCase.new($1)
+        @current_suite.cases << @current_case
       end
     
       # test case passed
@@ -84,13 +100,9 @@ module OCRunner
       end
       
       # test failure
-      if line =~ /(.+\.m):(\d+): error: -\[(.+) (.+)\] :(?: (.+):)? /
+      if line =~ /(.+\.m):(\d+): error: -\[(.+) (.+)\] :(?: (.+):?)? /
         @current_case.passed = false
-        @current_case.path = $1
-        @current_case.line = $2
-        @current_case.message = $5
-        @current_suite.cases << @current_case
-        @current_case = nil
+        @current_case.errors << TestError.new($1, $2, $5)
         print red('.')
       end
 
@@ -107,12 +119,25 @@ module OCRunner
         @current_suite = nil
         print "\n" # clear console line
       end
+
+      # test executable not found
+      if line =~ /The executable for the test bundle at (.+\.octest) could not be found/
+        build_error("Test executable #{clean_path($1)} could not be found")
+      end
+      
+      # compilation reference error
+      if line =~ /"(.+)", referenced from:/
+        puts red($&)
+      end
+      if line =~ /-\[\w+ \w+\] in .+\.o/
+        puts red($&)
+      end
       
       # no Xcode project found
       if line =~ /does not contain an Xcode project/
-        puts red('No Xcode project was found.')
-        exit
+        build_error('No Xcode project was found.')
       end
+      
     end
     
     def clean_path(path)

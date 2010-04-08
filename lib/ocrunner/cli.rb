@@ -5,7 +5,7 @@ module OCRunner
   module CLI
     def self.run
       
-      Kernel.trap('INT') { exit }
+      Kernel.trap('INT') { puts; exit }
       
       opts = Trollop::options do
         version_number = File.read(File.join(File.dirname(__FILE__), '../../VERSION')).strip

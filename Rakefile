@@ -11,6 +11,7 @@ begin
     gem.homepage = "http://github.com/jim/ocrunner"
     gem.authors = ["Jim Benton"]
     gem.add_dependency('trollop')
+    gem.executables = ['ocrunner']
   end
   Jeweler::GemcutterTasks.new
 rescue LoadError

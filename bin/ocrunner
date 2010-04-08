@@ -1,7 +1,9 @@
 #!/usr/bin/env ruby
 
-require 'rubygems'
-require 'trollop'
-require 'ocrunner'
+if ENV['OCDEBUG'] == 'true'
+  require File.join(File.dirname(__FILE__), '../lib/ocrunner')
+else
+  require 'ocrunner'
+end
 
 OCRunner::CLI.run

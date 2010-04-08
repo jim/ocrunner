@@ -11,7 +11,7 @@ Gem::Specification.new do |s|
   s.authors = ["Jim Benton"]
   s.date = %q{2010-04-08}
   s.default_executable = %q{ocrunner}
-  s.description = %q{Provides pretty console output}
+  s.description = %q{Provides pretty console output for running OCUnit tests with xcodebuilder from the command line}
   s.email = %q{jim@autonomousmachine.com}
   s.executables = ["ocrunner"]
   s.extra_rdoc_files = [

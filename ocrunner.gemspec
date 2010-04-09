@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{ocrunner}
-  s.version = "0.2.5"
+  s.version = "0.3.0"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Jim Benton"]
-  s.date = %q{2010-04-08}
+  s.date = %q{2010-04-09}
   s.default_executable = %q{ocrunner}
   s.description = %q{Provides pretty console output for running OCUnit tests with xcodebuilder from the command line}
   s.email = %q{jim@autonomousmachine.com}
@@ -40,7 +40,7 @@ Gem::Specification.new do |s|
   s.homepage = %q{http://github.com/jim/ocrunner}
   s.rdoc_options = ["--charset=UTF-8"]
   s.require_paths = ["lib"]
-  s.rubygems_version = %q{1.3.6}
+  s.rubygems_version = %q{1.3.5}
   s.summary = %q{A small Ruby wrapper for running OCUnit tests with xcodebuilder}
   s.test_files = [
     "test/helper.rb",

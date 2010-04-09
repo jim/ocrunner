@@ -31,7 +31,7 @@ module OCRunner
         opt :debug_command, "Print xcodebuild command and exit", :type => :boolean, :default => false
         opt :verbose, "Display all xcodebuild output after summary", :type => :boolean, :default => false
         opt :loud_compilation, "Always show verbose output when a compilation or linking error occurs", :type => :boolean, :default => true
-        opt :prplog, "Display purple log messages", :type => :boolean, :default => true
+        opt :prplog, "Display PRPLog log messages", :type => :boolean, :default => true
         opt :prplog_help, "Print PRPLog code example and exit", :type => :boolean, :default => false
       end
       

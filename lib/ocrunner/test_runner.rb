@@ -37,6 +37,9 @@ module OCRunner
     end
   
     def run_tests
+      
+      puts "ocrunner started. control-c to exit, control-\\ to toggle verbosity"
+      
       execute @command do |line|
         @log << line
         process_console_output(line)
@@ -92,6 +95,26 @@ module OCRunner
     end
 
     def process_console_output(line)
+      
+      if @options[:prplog]
+        if line.include?("\033\[35m")
+          out line.slice(line.index("\033\[35m")..-1)
+          @debug_output = true
+          return
+        end
+
+        if line.include?("\033[0m")
+          @debug_output = false
+          out line
+          out
+          return
+        end
+      
+        if @debug_output
+          out line
+          return
+        end 
+      end
 
       # test case started
       if line =~ /Test Case '-\[.+ (.+)\]' started/
@@ -115,7 +138,6 @@ module OCRunner
 
       # start test suite
       if line =~ /Test Suite '([^\/]+)' started/
-        puts line
         @current_suite = TestSuite.new($1)
         @suites << @current_suite
         print "#{$1} "
@@ -172,7 +194,7 @@ module OCRunner
     end
    
     def out(line = '')
-      @output << line
+      @output << line.rstrip
     end
     
     def clean_path(path)

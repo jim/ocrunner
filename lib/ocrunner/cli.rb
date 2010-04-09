@@ -26,9 +26,15 @@ module OCRunner
         opt :debug_command, "Print xcodebuild command and exit", :type => :boolean, :default => false
         opt :verbose, "Display all xcodebuild output after summary", :type => :boolean, :default => false
         opt :loud_compilation, "Always show verbose output when a compilation or linking error occurs", :type => :boolean, :default => true
+        opt :prplog, "Display purple log messages", :type => :boolean, :default => true
+        opt :prplog_help, "Print PRPLog code example and exit", :type => :boolean, :default => false
       end
       
-      puts "ocrunner started. control-c to exit, control-\\ to toggle verbosity"
+      if opts[:prplog_help]
+        puts "\nAdd this to a header or prefix file in your Xcode project:"
+        puts '#define PRPLog(format, ...) NSLog([NSString stringWithFormat: @"\033[35m%@\033[0m", format] ## __VA_ARGS__)' + "\n\n"
+        exit
+      end
       
       execute = Proc.new{ OCRunner::TestRunner.new(opts) }
 

@@ -3,6 +3,11 @@ require 'fssm'
 
 module OCRunner
   module CLI
+    
+    class << self
+      include OCRunner::Console
+    end
+    
     def self.run
       
       Kernel.trap('INT') { puts; exit }
@@ -31,8 +36,10 @@ module OCRunner
       end
       
       if opts[:prplog_help]
-        puts "\nAdd this to a header or prefix file in your Xcode project:"
-        puts '#define PRPLog(format, ...) NSLog([NSString stringWithFormat: @"\033[35m%@\033[0m", format] ## __VA_ARGS__)' + "\n\n"
+        present do
+          puts indent blue "Add this to a header or prefix file in your Xcode project:"
+          puts indent '#define PRPLog(format, ...) NSLog([NSString stringWithFormat: @"%s:%d:%s:\033[35m%@\033[0m", __PRETTY_FUNCTION__, __LINE__, __FILE__, format] ## __VA_ARGS__)'
+        end
         exit
       end
       

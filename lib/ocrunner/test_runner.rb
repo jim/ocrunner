@@ -15,8 +15,8 @@ module OCRunner
       @compilation_error_occurred = false
       @output = []
       
-      setup
       build_command
+      setup
       run_tests
       summarize
       display_results
@@ -31,14 +31,16 @@ module OCRunner
       @command = "xcodebuild -target #{@options[:target]} -configuration #{@options[:config]} " +
                  "-sdk #{@options[:sdk]} #{@options[:parallel] ? '-parallelizeTargets' : ''} build"
      if @options[:debug_command]
-       puts @command
+       present do
+         puts indent @command
+       end
        exit
      end
     end
   
     def run_tests
       
-      puts "ocrunner started. control-c to exit, control-\\ to toggle verbosity"
+      puts "ocrunner started. control-c to exit, control-\\ to toggle verbosity\n\n"
       
       execute @command do |line|
         @log << line
@@ -98,6 +100,8 @@ module OCRunner
       
       if @options[:prplog]
         if line.include?("\033\[35m")
+          line =~ /-(\[.+\]):(\d+):(.+):/
+          out blue("#{$1} on line #{$2} of #{clean_path($3)}:")
           out line.slice(line.index("\033\[35m")..-1)
           @debug_output = true
           return

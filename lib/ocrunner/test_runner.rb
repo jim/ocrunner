@@ -98,7 +98,7 @@ module OCRunner
 
     def process_console_output(line)
       
-      if @options[:prplog]
+      if @options[:oclog]
         if line.include?("\033\[35m")
           line =~ /-(\[.+\]):(\d+):(.+):/
           out blue("#{$1} on line #{$2} of #{clean_path($3)}:")

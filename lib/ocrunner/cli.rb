@@ -31,14 +31,15 @@ module OCRunner
         opt :debug_command, "Print xcodebuild command and exit", :type => :boolean, :default => false
         opt :verbose, "Display all xcodebuild output after summary", :type => :boolean, :default => false
         opt :loud_compilation, "Always show verbose output when a compilation or linking error occurs", :type => :boolean, :default => true
-        opt :prplog, "Display PRPLog log messages", :type => :boolean, :default => true
-        opt :prplog_help, "Print PRPLog code example and exit", :type => :boolean, :default => false
+        opt :oclog, "Display OCLog log messages", :type => :boolean, :default => true
+        opt :oclog_help, "Print OCLog code example and exit", :type => :boolean, :default => false
       end
       
-      if opts[:prplog_help]
+      if opts[:oclog_help]
         present do
           puts indent blue "Add this to a header or prefix file in your Xcode project:"
-          puts indent '#define PRPLog(format, ...) NSLog([NSString stringWithFormat: @"%s:%d:%s:\033[35m%@\033[0m", __PRETTY_FUNCTION__, __LINE__, __FILE__, format] ## __VA_ARGS__)'
+          puts indent '#define OCLog(format, ...) NSLog([NSString stringWithFormat: @"%s:%d:%s:\033[35m%@\033[0m", __PRETTY_FUNCTION__, __LINE__, __FILE__, format], ## __VA_ARGS__)'
+          puts indent '#define OCOLog(object) OCLog(@"%@", object)'
         end
         exit
       end
@@ -50,7 +51,7 @@ module OCRunner
       execute.call
       
       if opts[:auto]
-        FSSM.monitor(Dir.pwd, %w{**/*.m **/*.h}) do
+        FSSM.monitor(Dir.pwd, %w{**/*.m **/*.h **/*.pch}) do
           create { |base, relative| execute.call }
           update { |base, relative| execute.call }
           delete { |base, relative| execute.call }

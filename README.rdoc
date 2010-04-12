@@ -20,13 +20,16 @@ Control-c: kill ocrunner
 Control-\: toggle verbosity and rerun tests. This is nice for when the pretty filtered output doesn't show quite enough information to you.
 
 
-== Pretty debug logging with PRPLog()
+== Pretty debug logging with OCLog() and OCOLog()
 
-This is a little crazy, but ocrunner has support for displaying debug log messaged from your Objective-C code through the use of a custom logging macro. The messages are colored purple in order to make them easier to see in the verbose output. To use this feature, add the following macro to a header or prefix file in your Xcode project:
+This is a little crazy, but ocrunner has support for displaying debug log messaged from your Objective-C code through the use of two custom logging macros. The messages are colored purple in order to make them easier to see in the verbose output. To use this feature, add the following macro to a header or prefix file in your Xcode project:
   
-  #define PRPLog(format, ...) NSLog([NSString stringWithFormat: @"%s:%d:%s:\033[35m%@\033[0m", __PRETTY_FUNCTION__, __LINE__, __FILE__, format] ## __VA_ARGS__)
+  #define OCLog(format, ...) NSLog([NSString stringWithFormat: @"%s:%d:%s:\033[35m%@\033[0m", __PRETTY_FUNCTION__, __LINE__, __FILE__, format], ## __VA_ARGS__)
+  #define OCOLog(object) OCLog(@"%@", object)
+  
+OCLog is a drop in replacement for NSLog(). OCOLog is for logging a single values without having to specify the format string.
 
-ocrunner will display the latest version of this macro when run with --prplog-help.
+ocrunner will display the latest version of this macro when run with --oclog-help.
 
 
 == I don't like your defaults
@@ -42,8 +45,8 @@ Don't worry, you can specify the target/configuration/sdk options passed to xcod
      --debug-command, -d:   Print xcodebuild command and exit
            --verbose, -v:   Display all xcodebuild output after summary
   --loud-compilation, -l:   Always show verbose output when a compilation or linking error occurs (default: true)
-            --prplog, -r:   Display PRPLog log messages (default: true)
-       --prplog-help, -o:   Print PRPLog code example and exit
+            --oclog, -r:    Display OCLog log messages (default: true)
+       --oclog-help, -o:    Print OCLog code example and exit
            --version, -e:   Print version and exit
               --help, -h:   Show this message
 

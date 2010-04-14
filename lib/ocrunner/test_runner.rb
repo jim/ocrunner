@@ -100,10 +100,10 @@ module OCRunner
       
       if @options[:oclog]
         if line.include?("\033\[35m")
-          line =~ /-(\[.+\]):(\d+):(.+):/
+          line =~ /[\-|\+](\[.+\]):(\d+):(.+):/
           out blue("#{$1} on line #{$2} of #{clean_path($3)}:")
           out line.slice(line.index("\033\[35m")..-1)
-          @debug_output = true
+          @debug_output = true unless line.include?("\033[0m")
           return
         end
 
@@ -134,10 +134,8 @@ module OCRunner
       
       # test failure
       if line =~ /(.+\.m):(\d+): error: -\[(.+) (.+)\] :(?: (.+):?)?/
-        @current_case.fail!
         @current_case.errors << TestError.new($1, $2, $5)
-        @passed = false
-        print red('.')
+        test_failure_occurred!
       end
 
       # start test suite
@@ -197,11 +195,18 @@ module OCRunner
       @compilation_error_occurred = true
     end
    
+    def test_failure_occurred!
+      print red('.') if @current_case.passed? # only print a dot for the case's first failure
+      @current_case.fail!
+      @passed = false
+    end
+   
     def out(line = '')
       @output << line.rstrip
     end
     
     def clean_path(path)
+      return 'unknown' if path.nil?
       path.gsub(@current_directory + '/', '')
     end
   

@@ -43,7 +43,7 @@ module OCRunner
       puts "ocrunner started. control-c to exit, control-\\ to toggle verbosity\n\n"
       
       execute @command do |line|
-        @log << line
+        @log << line unless line =~ /setenv/
         process_console_output(line)
         $stdout.flush
       end

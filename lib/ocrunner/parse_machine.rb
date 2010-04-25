@@ -1,10 +1,16 @@
+require 'oniguruma'
+
 module OCRunner
   class ParseMachine
+    
+    include Oniguruma
+    
     class << self
       attr_accessor :events, :states
       def match(regex)
         @next_event ||= {}
-        @next_event[:regex] = regex
+        @next_event[:regexes] ||= []
+        @next_event[:regexes] << regex
       end
       def event(name, options={}, &block)
         @events ||= []
@@ -43,6 +49,24 @@ module OCRunner
         event[:name] == name
       end
     end
+   
+   def process_input(line)
+     self.class.events.each do |event|
+       if self.class.states[@state][:transitions].has_key?(event[:name])
+         event[:regexes].each do |regex|
+           if regex.is_a?(String)
+             regex = ORegexp.new(regex) 
+           end
+           if (match = regex.match(line))
+             args = [line] + match[1..-1]
+             self.instance_exec(*args, &event[:callback]) if event[:callback]
+             @state = self.class.states[@state][:transitions][event[:name]]
+             return
+           end
+         end
+       end
+     end
+   end
     
   end
 end

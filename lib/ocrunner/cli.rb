@@ -31,7 +31,6 @@ module OCRunner
         opt :debug_command, "Print xcodebuild command and exit", :type => :boolean, :default => false
         opt :verbose, "Display all xcodebuild output after summary", :type => :boolean, :default => false
         opt :loud_compilation, "Always show verbose output when a compilation or linking error occurs", :type => :boolean, :default => true
-        opt :oclog, "Display OCLog log messages", :type => :boolean, :default => true
         opt :oclog_help, "Print OCLog code example and exit", :type => :boolean, :default => false
       end
       

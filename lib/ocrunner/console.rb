@@ -2,6 +2,9 @@
 
 module OCRunner
   module Console
+    
+    attr :output
+    
     def colorize(text, color_code)
       "#{color_code}#{text.to_s}\033[0m"
     end
@@ -42,7 +45,19 @@ module OCRunner
     end
     
     def out(line = '')
+      @output ||= []
       @output << line.rstrip
     end
+    
+    def growl(message)
+      if @options[:growl]
+        execute "growlnotify -i \"xcodeproj\" -m \"#{message}\"" do |error|
+          if error =~ /command not found/
+            out red('You must have growl and growl notify installed to enable growl support. See http://growl.info.')
+          end
+        end
+      end
+    end
+    
   end
 end

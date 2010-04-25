@@ -20,10 +20,29 @@ module OCRunner
       end
       "  " * indents + text.to_s
     end
+    
+    def execute(cmd, &block)
+      IO.popen("#{cmd} 2>&1") do |f| 
+        while line = f.gets do 
+          yield line
+        end
+      end
+    end
+    
     def present(&block)
       puts
       yield
       puts
+    end
+   
+    def clean_path(path)
+      return 'unknown' if path.nil?
+      @current_directory = Dir.pwd
+      path.gsub(@current_directory + '/', '')
+    end
+    
+    def out(line = '')
+      @output << line.rstrip
     end
   end
 end

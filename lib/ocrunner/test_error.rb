@@ -1,6 +1,6 @@
 module OCRunner
   
-  # Container for test failures info
+  # Container for test failure info
   
   class TestError < Struct.new(:path, :line, :message)
   end

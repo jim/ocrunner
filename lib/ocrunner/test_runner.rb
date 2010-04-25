@@ -53,9 +53,10 @@ module OCRunner
       
       @suites.each do |suite|
         suite.failed_cases.each do |kase|
-          out '  ' + red("[#{suite.name} #{kase.name}] FAIL")
+          out indent red("[#{suite.name} #{kase.name}] FAIL")
           kase.errors.each do |error|
-            out '    ' + red(error.message) + " line #{error.line} of #{clean_path(error.path)}"
+            out indent 2, "on line #{error.line} of #{clean_path(error.path)}:"
+            out indent 2, red(error.message) 
           end
         end
         out if suite.failures?

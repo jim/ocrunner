@@ -10,8 +10,15 @@ module OCRunner
     def green(text); colorize(text, "\033[32m"); end
     def blue(text); colorize(text, "\033[34m"); end
     
-    def indent(text='')
-      "  " + text.to_s
+    def indent(*args)
+      if args.first.is_a? Numeric
+        indents = args.first
+        text = args.last
+      else
+        indents = 1
+        text = args.first
+      end
+      "  " * indents + text.to_s
     end
     def present(&block)
       puts

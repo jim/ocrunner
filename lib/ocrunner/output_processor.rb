@@ -42,7 +42,9 @@ module OCRunner
           out indent red("[#{suite.name} #{kase.name}] FAIL")
           kase.errors.each do |error|
             out indent 2, "on line #{error.line} of #{clean_path(error.path)}:"
-            out indent 2, red(error.message) 
+            error.message.each_line do |line|
+              out indent 2, red(line.strip)
+            end
           end
         end
         out if suite.failures?
@@ -159,7 +161,7 @@ module OCRunner
 
     match /(.+)/
     event :record_error do |message|
-      @current_case.errors.last.message << message
+      @current_case.errors.last.message << message + "\n"
     end
 
     match /Test Suite '([^\/]+)' started/

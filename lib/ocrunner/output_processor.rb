@@ -3,74 +3,6 @@ module OCRunner
 
     include Console
   
-    def initialize(out, options)
-      initialize_state
-      @passed = true
-      @suites = []
-      @log = ''
-      @out = out
-      @options = options
-      @compilation_error_occurred = false
-    end
-  
-    def process_line(line)
-      @log << line unless line =~ /setenv/
-      process_console_output(line)
-      @out.flush
-    end
-  
-    def build_error(message)
-      out red(message)
-      @passed = false
-    end
-
-    def build_failed
-      growl('BUILD FAILED!')
-      out red('*** BUILD FAILED ***')
-    end
-  
-    def build_succeeded
-      growl('Build succeeded.')
-      out green('*** BUILD SUCCEEDED ***')
-    end
-
-    def display_results
-      @suites.each do |suite|
-        suite.failed_cases.each do |kase|
-          out indent red("[#{suite.name} #{kase.name}] FAILED")
-          kase.errors.each do |error|
-            out indent 2, "on line #{error.line} of #{clean_path(error.path)}:"
-            error.message.each_line do |line|
-              out indent 2, red(line.strip)
-            end
-          end
-        end
-        out if suite.failures?
-      end
-      
-      @suites.each do |suite|
-        number = suite.failed_cases.size
-        out "Suite '#{suite.name}': #{suite.cases.size - number} passes and #{number} failures in #{suite.time} seconds."
-      end
-      
-      out
-      
-      if @passed
-        build_succeeded
-      else
-        build_failed
-      end
-      
-      puts @log if @options[:verbose] || (@compilation_error_occurred && @options[:loud_compilation])
-      puts red "A compilation error occurred" if @compilation_error_occurred
-      puts @output.join("\n")
-      puts
-    end
-
-    def process_console_output(line)
-      process_input(line)
-    end
-    
     default_state :ready
     
     state :ready, {
@@ -197,6 +129,70 @@ module OCRunner
     match /.+/
     event :record_build_log do |line|
       @log << line
+    end
+  
+    def initialize(out, options)
+      initialize_state
+      @passed = true
+      @suites = []
+      @log = ''
+      @out = out
+      @options = options
+      @compilation_error_occurred = false
+    end
+  
+    def process_line(line)
+      @log << line unless line =~ /setenv/
+      process_input(line)
+      @out.flush
+    end
+  
+    def build_error(message)
+      out red(message)
+      @passed = false
+    end
+
+    def build_failed
+      growl('BUILD FAILED!')
+      out red('*** BUILD FAILED ***')
+    end
+  
+    def build_succeeded
+      growl('Build succeeded.')
+      out green('*** BUILD SUCCEEDED ***')
+    end
+
+    def display_results
+      @suites.each do |suite|
+        suite.failed_cases.each do |kase|
+          out indent red("[#{suite.name} #{kase.name}] FAILED")
+          kase.errors.each do |error|
+            out indent 2, "on line #{error.line} of #{clean_path(error.path)}:"
+            error.message.each_line do |line|
+              out indent 2, red(line.strip)
+            end
+          end
+        end
+        out if suite.failures?
+      end
+      
+      @suites.each do |suite|
+        number = suite.failed_cases.size
+        out "Suite '#{suite.name}': #{suite.cases.size - number} passes and #{number} failures in #{suite.time} seconds."
+      end
+      
+      out
+      
+      if @passed
+        build_succeeded
+      else
+        build_failed
+      end
+      
+      puts @log if @options[:verbose] || (@compilation_error_occurred && @options[:loud_compilation])
+      puts red "A compilation error occurred" if @compilation_error_occurred
+      puts @output.join("\n")
+      puts
     end
  
     def compilation_error_occurred!

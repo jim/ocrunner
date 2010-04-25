@@ -67,13 +67,15 @@ module OCRunner
     end
 
     def process_console_output(line)
-      self.class.states[@state][:transitions].each_pair do |event_name, new_state|
-        event = event(event_name)
-        if (match = line.match(event[:regex]))
-          self.instance_exec(*match[1..-1], &event[:callback]) if event[:callback]
-          # puts red event_name
-          # puts blue new_state
-          @state = new_state
+      self.class.events.each do |event|
+        if self.class.states[@state][:transitions].has_key?(event[:name])
+          if (match = line.match(event[:regex]))
+            self.instance_exec(*match[1..-1], &event[:callback]) if event[:callback]
+            # puts red event[:name]
+            @state = self.class.states[@state][:transitions][event[:name]]
+            # puts blue @state
+            return
+          end
         end
       end
     
@@ -115,7 +117,19 @@ module OCRunner
     state :case_running, {
       :fail_case => :suite_running,
       :pass_case => :suite_running,
-      :case_error => :case_running
+      :start_error => :recording_error
+      # ,
+      # :start_log => :recording_log
+    }
+    
+    state :recording_error, {
+      :fail_case => :suite_running,
+      :record_error => :recording_error
+    }
+    
+    state :recording_log, {
+      :record_log => :recording_log,
+      :complete_log => :case_running
     }
     
     match /Test Case '-\[.+ (.+)\]' started/
@@ -139,14 +153,14 @@ module OCRunner
     end
     
     match /(.+\.m):(\d+): error: -\[(.+) (.+)\] :(?: (.+):?)?/
-    event :case_error do |file, line, klass, method, message|
+    event :start_error do |file, line, klass, method, message|
       @current_case.errors << TestError.new(file, line, message)
     end
 
-      # # test failure
-      # if line =~ /(.+\.m):(\d+): error: -\[(.+) (.+)\] :(?: (.+):?)?/
-      #   @current_case.errors << TestError.new($1, $2, $5)
-      # end
+    match /(.+)/
+    event :record_error do |message|
+      @current_case.errors.last.message << message
+    end
 
     match /Test Suite '([^\/]+)' started/
     event :start_suite do |suite_name|

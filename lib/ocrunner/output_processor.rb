@@ -75,7 +75,8 @@ module OCRunner
     
     state :ready, {
       :start_suite => :suite_running,
-      :fail_build => :build_failed
+      :fail_build => :build_failed,
+      :fail_without_project => :build_failed
     }
     
     state :suite_running, {

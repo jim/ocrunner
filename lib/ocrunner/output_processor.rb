@@ -71,6 +71,10 @@ module OCRunner
       process_input(line)
     end
     
+    def compilation_error_occurred!
+      @compilation_error_occurred = true
+    end
+    
     default_state :ready
     
     state :ready, {
@@ -107,26 +111,31 @@ module OCRunner
       :record_build_log => :build_failed
     }
 
-    match "[\\-|\\+](\\[.+\\]):(\\d+):(.+):\033\\[0m"
-    event :log_line do |line, signature, line_number, file|
+
+    # log a single entire line
+    match "[\\-|\\+](\\[.+\\]):(\\d+):(.+):(\033\\[35m.+\033\\[0m)"
+    event :log_line do |line, signature, line_number, file, log|
       out
       out indent blue("#{signature} logged on line #{line_number} of #{clean_path(file)}:")
-      out indent 2, line.slice(line.index("\033\[35m")..-1)
+      out indent 2, log
     end
-        
-    match '[\-|\+](\[.+\]):(\d+):(.+):'
-    event :start_log do |line, signature, line_number, file|
+
+    # multiline log begin
+    match "[\\-|\\+](\\[.+\\]):(\\d+):(.+):(\033\\[35m.+)"
+    event :start_log do |line, signature, line_number, file, log|
       out
       out indent blue("#{signature} logged on line #{line_number} of #{clean_path(file)}:")
-      out indent 2, line.slice(line.index("\033\[35m")..-1)
+      out indent 2, log
     end
-    
+
+    # multiline log end
     match "\033\\[0m"
     event :end_log do |line|
       out indent 2, line
       out
     end
-
+    
+    # multiline log body
     match /.+/
     event :record_log do |line|
       out indent 2, line
@@ -198,10 +207,6 @@ module OCRunner
     match /.+/
     event :record_build_log do |line|
       @log << line
-    end
- 
-    def compilation_error_occurred!
-      @compilation_error_occurred = true
     end
   
   end

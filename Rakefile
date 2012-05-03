@@ -12,7 +12,9 @@ begin
     gem.authors = ["Jim Benton"]
     gem.add_dependency('trollop')
     gem.add_dependency('fssm')
-    gem.add_dependency('oniguruma')
+    if RUBY_VERSION < '1.9'
+      gem.add_dependency('oniguruma')
+    end
     gem.executables = ['ocrunner']
   end
   Jeweler::GemcutterTasks.new

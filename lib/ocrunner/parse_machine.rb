@@ -1,9 +1,10 @@
-require 'oniguruma'
-
 module OCRunner
   class ParseMachine
     
-    include Oniguruma
+    if RUBY_VERSION < '1.9'
+      require 'oniguruma'
+      include Oniguruma
+    end
     
     class << self
       attr_accessor :events, :states
@@ -55,7 +56,11 @@ module OCRunner
        if self.class.states[@state][:transitions].has_key?(event[:name])
          event[:regexes].each do |regex|
            if regex.is_a?(String)
-             regex = ORegexp.new(regex) 
+             if RUBY_VERSION < '1.9'
+               regex = ORegexp.new(regex) 
+             else
+               regex = Regexp.new(regex) 
+             end
            end
            if (match = regex.match(line))
              args = [line] + match[1..-1]
